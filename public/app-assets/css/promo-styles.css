@@ -1,0 +1,95 @@
+.bg-div{
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.promo-body{
+    font-family: 'Lato', sans-serif;
+}
+
+.login-wrapper{
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+}
+
+.login-modal img{
+    margin-bottom: 40px;
+}
+
+.login-modal h3{
+    font-weight: bold;
+    margin-bottom: 60px;
+}
+
+.login-modal{
+    height: 550px;
+    width: 30%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    margin-top: 6%;
+}
+
+.form-cols{
+    height: 100%;
+}
+
+.form-cols form{
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-cols form input{
+    margin-bottom: 20px;
+}
+
+.form-imput{
+    border: none;
+    padding: 10px;
+    border-bottom: 1px solid grey;
+    outline: none;
+}
+
+.form-imput:focus{
+    outline: none;
+}
+
+.promo-login-btn{
+    margin-top: 8%;
+}
+
+.row-1{
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.leaderboard-wrapper{
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+.leaderboard-sec-1{
+    justify-content: flex-end;
+}
+
+.leaderboard-sec-1 div{
+    align-items: baseline;
+    width: 50%;
+    text-align: right;
+    justify-content: flex-end;
+}
+.leaderboard-sec-1 div h3{
+    margin-right: 2%;
+    font-size: 20px;
+}
+
+
+.leaderboard-sec-1 div i{
+    font-size: 20px;
+    color: black;
+}
