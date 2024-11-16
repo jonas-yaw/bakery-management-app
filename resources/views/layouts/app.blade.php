@@ -37,6 +37,8 @@
 
       </div>
       @livewireScripts
+      <x-livewire-alert::scripts />
+      <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @include('includes.scripts')
 
     </div>

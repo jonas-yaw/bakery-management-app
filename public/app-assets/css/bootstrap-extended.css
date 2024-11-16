@@ -1809,8 +1809,8 @@ body[data-col="1-column"] .header-navbar.floating-nav {
   .breadcrumb .breadcrumb-item + .breadcrumb-item {
     padding-left: 0; }
     .breadcrumb .breadcrumb-item + .breadcrumb-item:before {
-      content: "\e847";
-      font-family: 'feather';
+      content: "\f101";
+      font-family: 'FontAwesome';
       color: #626262; }
   .breadcrumb .breadcrumb-item.active {
     color: #626262; }

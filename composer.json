@@ -8,6 +8,7 @@
         "php": "^8.2",
         "biscolab/laravel-recaptcha": "^6.1",
         "blade-ui-kit/blade-heroicons": "^2.4",
+        "jantinnerezo/livewire-alert": "^3.0",
         "kwn/number-to-words": "^2.9",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",

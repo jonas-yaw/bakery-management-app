@@ -3,7 +3,6 @@
   <!-- BEGIN: Vendor JS-->
   <script src="{{ asset('/app-assets/vendors/js/vendors.min.js')}}"></script>
   <script src="{{ asset('/app-assets/js/scripts/components.js')}}"></script>
-  <script src="{{ asset('/app-assets/js/scripts/components.js')}}"></script>
 
   <script src="{{ asset('/app-assets/js/custom.js')}}"></script>
   <script src="{{ asset('/app-assets/js/custom.min.js')}}"></script>
