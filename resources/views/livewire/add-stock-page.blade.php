@@ -4,6 +4,9 @@ x-data="{
     rows: @entangle('rows'),
     currentRow: @entangle('currentRow'),
     currentRowIndex: @entangle('currentRowIndex'),
+    itemCategory_x: @entangle('itemCategory'),
+    itemBrand_x: @entangle('itemBrand'),
+    itemSupplier_x: @entangle('itemSupplier'),
     showAmendButton: true,
     addRow() {
       this.rows.push({
@@ -198,6 +201,9 @@ style="font-family: 'Nunito'"
                                 <tr>
                                     <th class="tw-border tw-bg-neutral-100 tw-w-1/12 tw-px-4 tw-py-1 tw-text-center">
                                     <input type="checkbox" x-model="selectAll" 
+                                    @if ($editStatus == 'uneditable')
+                                    disabled
+                                    @endif
                                     x-on:change="
                                         checked = selectAll ? rows.map((_, index) => index) : [];
                                     "
@@ -232,13 +238,18 @@ style="font-family: 'Nunito'"
                                         x-on:change="
                                             selectAll = (checked.length === rows.length);
                                         "
+                                        @if ($editStatus == 'uneditable')
+                                        disabled
+                                        @endif
                                         >
                                     </td>
                                     <td class="tw-border tw-px-4 tw-py-4 tw-w-1/12" x-text="index + 1"></td>
                                     <td class="tw-border tw-px-4 tw-py-4 tw-w-4/12">
                                         <select x-model="row.unit_of_measure"
-                                        x-on:change="getRowSizes(row,index)"
-                                            class="tw-w-full tw-bg-white tw-outline-none tw-ring-0 focus:outline-none tw-border-2 tw-border-transparent tw-focus:border-blue-500"  
+                                        @if ($editStatus == 'uneditable')
+                                        disabled
+                                        @endif
+                                        class="tw-w-full tw-bg-white tw-outline-none tw-ring-0 focus:outline-none tw-border-2 tw-border-transparent tw-focus:border-blue-500"  
                                         >
                                         <option value=""></option>
                                         @foreach ($uoms as $uom)
@@ -249,10 +260,15 @@ style="font-family: 'Nunito'"
         
                                     <td class="tw-border tw-px-4 tw-py-4 tw-w-2/12">
                                         <select x-model="row.conversion_factor"
+                                        @if ($editStatus == 'uneditable')
+                                        disabled
+                                        @endif
                                             class="tw-w-full tw-bg-white tw-outline-none tw-ring-0 focus:outline-none tw-border-2 tw-border-transparent tw-focus:border-blue-500"
                                         >
                                         <template x-for="size in row.sizes" :key="size">
-                                            <option :value="size" x-text="size"></option>
+                                            <option 
+                                            :selected="size === row.conversion_factor"
+                                            :value="size" x-text="size"></option>
                                         </template>
                                         
                                         </select>
@@ -263,6 +279,9 @@ style="font-family: 'Nunito'"
                                         <input type="text" x-model="row.amount"
                                             class="tw-w-full  tw-bg-white tw-outline-none tw-ring-0 focus:outline-none tw-border-2 tw-border-transparent tw-focus:border-blue-500"  
                                             @input="row.amount = formatNumber($event.target.value)"
+                                            @if ($editStatus == 'uneditable')
+                                            disabled
+                                            @endif
                                         >
                                     </td>
                                 
@@ -288,10 +307,15 @@ style="font-family: 'Nunito'"
                                 </button>
                                 </div>
                             
+                                @if ($editStatus <> 'uneditable')
                                 <button x-on:click="addRow" type="button"
-                                    class="tw-cursor-pointer tw-flex tw-flex-row tw-gap-1 tw-items-center tw-rounded tw-bg-slate-800 tw-px-6 tw-pb-2 tw-pt-2.5 tw-text-xs tw-font-bold tw-uppercase tw-leading-normal tw-text-white ">
-                                    <x-heroicon-o-plus class="tw-w-6 tw-h-4 tw-text-white " />  Add row
+                                class="tw-cursor-pointer tw-flex tw-flex-row tw-gap-1 tw-items-center tw-rounded tw-bg-slate-800 tw-px-6 tw-pb-2 tw-pt-2.5 tw-text-xs tw-font-bold tw-uppercase tw-leading-normal tw-text-white ">
+                                <x-heroicon-o-plus class="tw-w-6 tw-h-4 tw-text-white " />  Add row
                                 </button>
+                                @endif
+                             
+                               
+                               
                             </div>
                             
                         </div>

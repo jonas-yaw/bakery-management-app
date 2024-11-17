@@ -139,7 +139,7 @@ class="tw-text-black"
                             <td class="tw-p-3"><input type="checkbox" value="{{ $item->id }}" x-model="checked"></td>
                             <td class="tw-p-3 tw-text-center">{{ $key++ }}</td>
                             <td class="tw-text-center hover:tw-underline">
-                                <a class="tw-text-black hover:tw-text-black" href="/stock-item-detail/{{ Crypt::encrypt($item->code) }}">
+                                <a class="tw-text-black hover:tw-text-black" href="/get-stock-item-detail/{{ Crypt::encrypt($item->code) }}">
                                     {{ $item->code }}
                                 </a>
                             </td>

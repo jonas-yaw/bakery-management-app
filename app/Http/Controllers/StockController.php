@@ -494,4 +494,10 @@ class StockController extends Controller
     public function addStockItemPage(){
         return view('stock.add_stock_item_full_page');
     }
+
+    public function getStockItemDetail($id){
+        $code = Crypt::decrypt($id);
+        $stockItem = Stock::where('code', $code)->first();
+        return view('stock.edit_stock_item_full_page',compact('stockItem'));
+    }
 }

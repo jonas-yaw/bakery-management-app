@@ -315,7 +315,10 @@ Route::post('/update-stock-item',
 Route::get('/add-stock-item-page', 
 ['uses' => '\App\Http\Controllers\StockController@addStockItemPage',
 		'as' => 'add-stock-item-page',]);
-
+		
+Route::get('/get-stock-item-detail/{id}', 
+['uses' => '\App\Http\Controllers\StockController@getStockItemDetail',
+		'as' => 'get-stock-item-detail',]);
 #----------------REPORTS
 Route::get('/get-reports', 
 ['uses' => '\App\Http\Controllers\ReportsController@index',
