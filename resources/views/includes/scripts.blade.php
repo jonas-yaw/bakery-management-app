@@ -149,3 +149,19 @@
     @endif
   
   </script>
+
+<script>
+  function formatNumber(value) {
+  // Remove all non-numeric characters except for the decimal point
+  value = value.replace(/[^0-9.]/g, '');
+
+  // Split the value into the integer and decimal parts
+  const parts = value.split('.');
+
+  // Add commas to the integer part
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // Join the integer and decimal parts (if any)
+  return parts.join('.');
+}
+</script>

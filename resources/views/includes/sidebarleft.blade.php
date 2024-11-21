@@ -1,4 +1,4 @@
-<div class="col-md-3 left_col" id="main-sidebar-div">
+<div class="col-md-3 left_col tw-bg-sky-950 z-10" id="main-sidebar-div">
   <div class="left_col scroll-view">
   
     <div class="clearfix"></div>
@@ -16,12 +16,16 @@
           <!-- <li><a href="/get-members"><i class="fa fa-group"></i> Members</a> </li> -->
           <li><a href="/home"><i class="fa fa-home"></i> Home</a></li>
 
-          @permission('view-catalogue')
+{{--           @permission('view-catalogue')
           <li><a href="/get-catalogue"><i class="fa fa-files-o"></i> Catalogue</a> </li>
+          @endpermission --}}
+
+          @permission('view-catalogue')
+          <li><a href="/create-sale"><i class="fa fa-plus-square"></i> POS</a> </li>
           @endpermission
 
           @permission('view-manage-sales')
-          <li><a href="/get-payments"><i class="fa fa-money"></i> Manage Sales </a> </li>
+          <li><a href="/get-payments"><i class="fa fa-money"></i>Payments</a> </li>
           @endpermission
 
           @permission('view-stock')
