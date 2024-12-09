@@ -3,7 +3,7 @@
 x-cloak 
 x-init="$watch('selectPage', value => selectPageUpdated(value))" 
 x-data="{
-    stockCurrent: @entangle('stockInPage'),
+    quotationsCurrent: @entangle('quotationsInPage'),
     sortField: @entangle('sortField'),
     sortDirection: @entangle('sortDirection'),
     selectPage: false,
@@ -31,7 +31,7 @@ x-data="{
     },
     selectPageUpdated(value) {
         if (value) {
-            this.checked = this.stockCurrent;
+            this.checked = this.quotationsCurrent;
         } else {
             this.checked = [];
         }
@@ -42,7 +42,9 @@ x-data="{
 }"
 class="tw-text-black"
 >
-    <div class="tw-flex tw-flex-row tw-justify-end tw-gap-3">
+    <div class="tw-flex tw-flex-row tw-justify-end tw-gap-3 tw-mb-3">
+
+        
         <div x-show="checked.length > 0" class="tw-relative tw-w-48 tw-mb-3" x-transition>
             <div class="tw-flex tw-flex-row tw-justify-end">
                 <div @click="showActionDropDown = ! showActionDropDown"  class=" tw-w-fit tw-flex tw-flex-row tw-items-center tw-gap-2 tw-bg-black tw-text-white tw-py-2 tw-px-4 tw-rounded-md tw-cursor-pointer hover:tw-shadow-md">
@@ -65,26 +67,26 @@ class="tw-text-black"
              >
                 <div>
                     <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer"  @click="exportSelected">Export</div>
-                    <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer" @click="confirmDelete">Delete</div> 
+                    {{-- <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer" @click="confirmDelete">Delete</div> --}}
                 </div>
             </div>
+            
         </div>
 
-       
-        <a href="/add-stock-item-page" class=" hover:no-underline">
-            <x-custom-btn title="Add Item" icon="heroicon-o-plus-circle"/>
+        <a href="/add-quotation-page" class=" hover:no-underline">
+            <x-custom-btn title="Add Quotation" icon="heroicon-o-plus-circle"/>
         </a>
       
    </div>
 
 
-    <div class="tw-border tw-border-neutral-200 tw-rounded-md tw-mt-6 tw-p-5 tw-flex tw-flex-col tw-justify-between tw-content-max-height">
+    <div class="tw-border tw-border-neutral-200 tw-rounded-md  tw-p-5 tw-flex tw-flex-col tw-justify-between tw-content-max-height">
         <div>
             <div class="tw-grid tw-grid-cols-6 tw-mt-2">
                 <div class=" tw-col-span-4 tw-flex tw-flex-row tw-flex-wrap tw-gap-3">  
-                    <x-filter-input filtername='code_filter' placeholder='Code' wireFilterName='codeFilter'></x-filter-input>
-                    <x-filter-input filtername='name_filter' placeholder='Name' wireFilterName='nameFilter'></x-filter-input>
-                    <x-filter-input filtername='brand_filter' placeholder='Type' wireFilterName='brandFilter'></x-filter-input>
+                    <x-filter-input filtername='receipt_number_filter' placeholder='Receipt #' wireFilterName='receiptNumberFilter'></x-filter-input>
+                    <x-filter-input filtername='collection_mode_filter' placeholder='Collection mode' wireFilterName='collectionModeFilter'></x-filter-input>
+                    <x-filter-input filtername='product_filter' placeholder='Item' wireFilterName='productFilter'></x-filter-input>
                     <x-filter-input filtername='category_filter' placeholder='Category' wireFilterName='categoryFilter'></x-filter-input>
                        
                 </div>
@@ -107,8 +109,8 @@ class="tw-text-black"
                                 <ul class="tw-flex tw-flex-col tw-gap-1 ">
                                     {{-- <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('id')">ID</li> --}}
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('created_on','Created On')">Created On</li>
-                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('code','Code')">Code</li>
-                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('item','Name')">Name</li>
+                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('receipt_number','Receipt Number')">Receipt #</li>
+                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('product','Item')">Item</li>
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('brand','Brand')">Brand</li>
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('category','Category')">Category</li>
                                     
@@ -128,36 +130,30 @@ class="tw-text-black"
                     <thead>
                         <tr class=" tw-bg-neutral-200 tw-py-2 tw-rounded-full tw-text-black">
                             <th class="tw-p-3"><input type="checkbox" x-model="selectPage"></th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">ID</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Code</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Quotation #</th>
                             <th class="tw-text-center tw-p-2 tw-font-semibold">Name</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Category</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Type</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Quantity Available</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Price Per Unit</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Created On</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Mobile Number</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Amount</th>
                             <th class="tw-text-center tw-p-2 tw-font-semibold">Created By</th>
-                            <th></th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Created On</th>
+                            {{-- <th></th> --}}
                         </tr>
                     </thead>
 
                     <tbody style="font-size: 15px;">
-                        @foreach( $stock as $key => $item )
+                        @foreach( $quotations as $key => $item )
                         <tr class="tw-text-black tw-border-b tw-border-b-neutral-200 tw-cursor-pointer hover:tw-bg-neutral-100">
                             <td class="tw-p-3"><input type="checkbox" value="{{ $item->id }}" x-model="checked"></td>
-                            <td class="tw-p-3 tw-text-center">{{ $key++ }}</td>
                             <td class="tw-text-center hover:tw-underline">
-                                <a class="tw-text-black hover:tw-text-black" href="/get-stock-item-detail/{{ Crypt::encrypt($item->code) }}">
-                                    {{ $item->code }}
+                                <a class="tw-text-black hover:tw-text-black" href="/edit-quotation-page/{{ Crypt::encrypt($item->id) }}">
+                                    {{ $item->quotation_number }}
                                 </a>
                             </td>
-                            <td class="tw-text-center">{{ ucwords(strtolower(Str::limit($item->item,50))) }}</td> 
-                            <td class="tw-text-center">{{ $item->category }}</td>
-                            <td class="tw-text-center">{{ $item->brand }}</td>
-                            <td class="tw-text-center">{{ $item->quantity }}</td>
-                            <td class="tw-text-center">{{ $item->price_per_unit }}</td>
+                            <td class="tw-text-center">{{ ucwords(strtolower(Str::limit($item->customer_name,50))) }}</td>
+                            <td class="tw-text-center">{{ $item->customer_mobile_number }}</td>
+                            <td class="tw-text-center">{{ $item->total_amount }}</td>
+                            <td class="tw-text-center">{{ $item->created_by }}
                             <td class="tw-text-center">{{ $item->created_on }}</td>
-                            <td class="tw-text-center">{{ $item->created_by }}</td>
                         </tr>
                         @endforeach
                     </tbody>

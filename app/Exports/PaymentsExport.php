@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\Stock;
+use App\Models\Payments;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
 
-class StockExport implements FromQuery
+class PaymentsExport implements FromQuery
 {
     use Exportable;
     protected $items;
@@ -17,6 +17,6 @@ class StockExport implements FromQuery
 
     public function query()
     {
-        return Stock::query()->whereKey($this->items);
+        return Payments::query()->whereKey($this->items);
     }
 }

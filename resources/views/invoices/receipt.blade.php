@@ -10,16 +10,22 @@
     <body>
         <div class="ticket">
             <div class="inner-div">
-                <br>
-                <div class="col-md-6 text-center align-self-center logo-img-div">
-                    <div>
-                        <img src="/images/{{ $mycompany->document_logo }}" style="width:100%" alt="branding logo">
-                    </div>
-                   
-                </div>
+                
+            @if($mycompany->document_logo != null) 
+            <br>
+            <div class="col-md-6 text-center align-self-center logo-img-div">
+                <div>
+                    <img src="/images/{{ $mycompany->document_logo }}" style="width:100%" alt="branding logo">
+                </div> 
+            </div>
+            <br>
+            <br>
+            @else 
+                <h3 class="centered">{{ $company->legal_name }}</h3>
+            @endif  
+        
             <p class="centered">{{ $company->motto }}
-                <br>
-                <br>
+                
                 {{ $company->address }}
                 <br>{{ $company->phone }}</p>
                 <span>Receipt No.: {{ $payments[0]->receipt_number }}</span>

@@ -3,12 +3,14 @@
 namespace App\Livewire;
 
 use Carbon\Carbon;
+use App\Models\Image;
 use App\Models\Stock;
 use App\Models\Brands;
 use App\Models\Serials;
 use Livewire\Component;
 use App\Models\Suppliers;
 use App\Models\Categories;
+use Livewire\WithFileUploads;
 use App\Models\StockSizeAndPrices;
 use App\Models\UnitsOfMeasurement;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +18,14 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class AddStockPage extends Component
 {
+    use WithFileUploads;
     use LivewireAlert;
     
-    public $editStatus = 'editable',$itemCategory = 'PAINT',$itemName,$itemBrand,
+    public $editStatus = 'editable',$itemCategory,$itemName,$itemBrand,
     $itemSupplier,$itemQuantity,$itemRestockLimit,$itemCostPrice,
     $itemSellingPrice,
-    $status,$itemCode;
+    $status,$itemCode,
+    $photo;
 
     public $rows = [],$currentRow = [],$currentRowIndex = null;
 
@@ -40,32 +44,16 @@ class AddStockPage extends Component
             $this->itemRestockLimit = $stockItem->restock_limit;
             $this->itemCostPrice = $stockItem->cost_price_per_unit;
             $this->itemSellingPrice = $stockItem->price_per_unit;
+            $this->photo = $stockItem->image;
 
-            $stockEntryRows = StockSizeAndPrices::where('code',$stockItem->code)->get();
-
-            foreach($stockEntryRows as $entry){
-                $sizes_available= UnitsOfMeasurement::where('type',$entry->uom)
-                ->pluck('size');
-
-                $this->rows[] = [       
-                    'unit_of_measure' => $entry->uom,
-                    'conversion_factor' => $entry->size,
-                    'amount' => $entry->price_per_unit,
-                    'sizes' => $sizes_available,
-                ];
-            }
         }else{
             $this->itemCode = null;
         }
+    }
 
-       /*  $this->rows = [
-            [
-                'unit_of_measure' => '',
-                'conversion_factor' => '',
-                'amount' => '',
-                'sizes' => [],
-            ]
-        ]; */
+    public function removePhoto()
+    {
+        $this->photo = null;
     }
 
     public function updateEditableState(){
@@ -96,7 +84,8 @@ class AddStockPage extends Component
             'itemBrand' => 'required',
             'itemQuantity' => 'required',
             'itemRestockLimit' => 'required',
-            'itemCostPrice'=>'required'
+            'itemSellingPrice'=>'required',
+            'photo' => 'required|mimes:jpg,jpeg,png|max:10240', // 1MB Max
         ]);
 
          // Check uniqueness
@@ -133,8 +122,7 @@ class AddStockPage extends Component
 
             $affectedRows = Stock::where('code',$code)->delete();
             
-            $affectedRows = $this->status = 'new' ? 1 : $affectedRows;
-
+            $affectedRows = $this->status == 'new' ? 1 : $affectedRows;
             if($affectedRows){
                 $item = new Stock;
                 $item->code       = $code;
@@ -144,37 +132,16 @@ class AddStockPage extends Component
                 $item->supplier   = $this->itemSupplier;
                 $item->quantity   = $this->itemQuantity;
                 $item->restock_limit   = $this->itemRestockLimit;
-                $item->cost_price_per_unit  = $this->itemCostPrice;
+                //$item->cost_price_per_unit  = $this->itemCostPrice;
+                $item->image = $this->photo->getClientOriginalName();
                 $item->price_per_unit  = $this->itemSellingPrice;
                 $item->created_on      = Carbon::now();
                 $item->created_by      = Auth::user()->getNameOrUsername();
     
+                $filepath = 'attachments';
+                $this->photo->storeAs($filepath, $this->photo->getClientOriginalName(), 'public');
                 
                 if($item->save()){
-                    $oldStockEntry = StockSizeAndPrices::where('code',$code)->get();
-                    $affectedRows2 = 1;
-                    if($oldStockEntry->count() > 0){
-                        foreach($oldStockEntry as $entry){
-                            $affectedRows2 += StockSizeAndPrices::where('id',$entry->id)->delete();
-                        }
-                    }
-
-                    if((count($this->rows) > 0) && ($affectedRows2 > 0)){
-                        
-                        foreach($this->rows as $row){
-                            $entrySizeAndPrice = new StockSizeAndPrices;
-                            $entrySizeAndPrice->code                 = $code;
-                            $entrySizeAndPrice->uom                  = $row['unit_of_measure'];
-                            $entrySizeAndPrice->size                 = $row['conversion_factor'];
-                            $entrySizeAndPrice->price_per_unit       = $row['amount'];
-                            $entrySizeAndPrice->created_on           = Carbon::now();
-                            $entrySizeAndPrice->created_by           = Auth::user()->getNameOrUsername();
-            
-                            $entrySizeAndPrice->save(); 
-                        }
-                    }
-                    //$this->alert('success', 'Item added successfully !');
-
                     if($this->status == 'new'){
                         return redirect()
                         ->route('get-stock')
@@ -183,7 +150,8 @@ class AddStockPage extends Component
 
                     $this->alert('success', 'Item updated successfully !');
                     $this->dispatch('$refresh');
-
+                }else{
+                    $this->alert('error', message: 'Process failed to complete !');
                 }
             }
 

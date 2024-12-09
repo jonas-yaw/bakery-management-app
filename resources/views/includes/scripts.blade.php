@@ -23,7 +23,6 @@
 
   <script src="{{ asset('/app-assets/vendors/js/extensions/toastr.min.js')}}"></script>
 
-  <script src="{{ asset('/app-assets/js/scripts/pages/dashboard-analytics.js')}}"></script>
   <script src="{{ asset('/app-assets/vendors/js/ui/jquery.sticky.js')}}"></script>
 
 
@@ -67,8 +66,6 @@
   <!-- <script src="{{ asset('/app-assets/vendors/js/editors/quill/katex.min.js')}}"></script>
   <script src="{{ asset('/app-assets/vendors/js/editors/quill/highlight.min.js')}}"></script>
   <script src="{{ asset('/app-assets/vendors/js/editors/quill/quill.min.js')}}"></script> -->
-  <script src="{{ asset('/app-assets/js/scripts/pages/app-email.js')}}"></script>
-
 
 
 

@@ -24,6 +24,10 @@
           <li><a href="/create-sale"><i class="fa fa-plus-square"></i> POS</a> </li>
           @endpermission
 
+          @permission('view-quotations')
+          <li><a href="/get-quotations"><i class="fa  fa-files-o"></i> Quotations</a> </li>
+          @endpermission
+
           @permission('view-manage-sales')
           <li><a href="/get-payments"><i class="fa fa-money"></i>Payments</a> </li>
           @endpermission

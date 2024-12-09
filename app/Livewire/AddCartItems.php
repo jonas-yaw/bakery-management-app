@@ -10,15 +10,20 @@ use App\Models\Payments;
 use App\Models\PaymentType;
 use Illuminate\Support\Str;
 use App\Models\ExchangeRate;
+use Livewire\WithPagination;
 use App\Models\StockSizeAndPrices;
 use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class AddCartItems extends Component
 {
-    use LivewireAlert;
-    public $searchInput,$searchResultsrows = [],$showSearchListModal = false,$currentSearchRow = [],$currentSearchRowIndex = null,$selectedSearchValue;
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
+    use LivewireAlert;
+    public $searchInput,$showCartPage = true,
+    $searchResultsrows = [],$showSearchListModal = false,$currentSearchRow = [],$currentSearchRowIndex = null,$selectedSearchValue;
+    public $paginate = 8;
     public $addedItemsRowArr = [],$currentAddedItemRowArr = [],$currentAddedItemRowIndex = null;
     public $discount='0.0',$deliveryFee='0.0',$customerName,$customerMobileNumber,$paymentMode='Cash',$amountCollected,$balance='0.0',$referenceNumber;
     protected $listeners = ['updateSearchRowPrice','addItemsToCart','updateAddedToCartRowPrice','toggleItemSellingQuantity','removeAddedCartItem'];
@@ -102,53 +107,48 @@ class AddCartItems extends Component
     }
 
     public function addItemsToCart($index){
+        $row = $this->stock->where('id',$index)->first();
         $itemExists = false;
-        $row = $this->searchResultsrows[$index];
 
         if(count($this->addedItemsRowArr) > 0){
             foreach($this->addedItemsRowArr as $item){
-                if($item['id'] == $row['id']){
+                if($item['id'] == $row->id){
                     $itemExists = true;
+
                     break;
                 }
             }
 
             if(!$itemExists){
                 $this->addedItemsRowArr[] = [
-                    'id' => $row['id'],
-                    'code' => $row['code'],
-                    'item' => $row['item'],
-                    'category' => $row['category'],
-                    'brand' => $row['brand'],
-                    'quantity' => $row['quantity'],
+                    'id' => $row->id,
+                    'code' => $row->code,
+                    'item' => $row->item,
+                    'image' => $row->image,
+                    'category' => $row->category,
+                    'brand' => $row->brand,
+                    'quantity' => $row->quantity,
                     'selling_quantity' => 1,
-                    'price_per_unit' => $row['price_per_unit'],
-                    'restock_limit' => $row['restock_limit'],
-                    'sizes_and_prices' => $row['sizes_and_prices'],
-                    'selected_uom' => count($row['sizes_and_prices']) > 0 ?  $row['sizes_and_prices'][0]['uom'] : '',
-                    'selected_size' => count($row['sizes_and_prices']) > 0 ?  $row['sizes_and_prices'][0]['size'] : '',
-                    'total_price' => $row['price_per_unit']
+                    'price_per_unit' => $row->price_per_unit,
+                    'restock_limit' => $row->restock_limit,
+                    'total_price' => $row->price_per_unit
                 ];
             }
         }else{
-            //$this->addedItemsRowArr[] = $row;
             $this->addedItemsRowArr[] = [
-                'id' => $row['id'],
-                'code' => $row['code'],
-                'item' => $row['item'],
-                'category' => $row['category'],
-                'brand' => $row['brand'],
-                'quantity' => $row['quantity'],
+                'id' => $row->id,
+                'code' => $row->code,
+                'item' => $row->item,
+                'image' => $row->image,
+                'category' => $row->category,
+                'brand' => $row->brand,
+                'quantity' => $row->quantity,
                 'selling_quantity' => 1,
-                'price_per_unit' => $row['price_per_unit'],
-                'restock_limit' => $row['restock_limit'],
-                'sizes_and_prices' => $row['sizes_and_prices'],
-                'selected_uom' => count($row['sizes_and_prices']) > 0 ?  $row['sizes_and_prices'][0]['uom'] : '',
-                'selected_size' => count($row['sizes_and_prices']) > 0 ?  $row['sizes_and_prices'][0]['size'] : '',
-                'total_price' => $row['price_per_unit']
+                'price_per_unit' => $row->price_per_unit,
+                'restock_limit' => $row->restock_limit,
+                'total_price' => $row->price_per_unit
             ];
         }
-
         
     }
 
@@ -169,6 +169,18 @@ class AddCartItems extends Component
 
     public function removeAddedCartItem($index){
         array_splice($this->addedItemsRowArr, $index, 1);
+    }
+
+
+    public function getStockQueryProperty(){
+        return Stock::when($this->searchInput, function($query){
+            $query->where('item','like','%'.trim($this->searchInput).'%')
+            ->orWhere('code','like','%'.trim($this->searchInput).'%');
+        });
+    }
+
+    public function getStockProperty(){
+        return $this->stockQuery->paginate($this->paginate);
     }
 
     public function submit(){
@@ -218,8 +230,7 @@ class AddCartItems extends Component
             $payment->reference                    = $item['code'];
             $payment->product                      = $item['item'];
             $payment->category                     = $item['category'];
-            $payment->uom                          = $item['selected_uom'];
-            $payment->size                         = $item['selected_size'];
+            $payment->brand                        = $stockItemDetails->brand;
             $payment->quantity                     = $item['selling_quantity'];
             $payment->customer_name                = ucwords(strtolower(Str::of($this->customerName)->trim(' ')));
             $payment->customer_mobile_number       = $this->customerMobileNumber;
@@ -230,6 +241,14 @@ class AddCartItems extends Component
             $payment->balance                      = $this->balance;
 
             $affectedRows += $payment->save();
+
+            //reduce stock here 
+            if(($stockItemDetails->quantity - $item['selling_quantity']) > 0){
+                $affectedRows2 =  Stock::where('code',$item['code'])->update([
+                    'quantity' => $stockItemDetails->quantity - $item['selling_quantity']
+                ]);
+            }
+
         }
 
         if($affectedRows > 0){
@@ -244,6 +263,7 @@ class AddCartItems extends Component
     public function render()
     {
         return view('livewire.add-cart-items',[
+            'stockItems' => $this->stock,
             'payment_modes' => PaymentType::all(),
         ]);
     }

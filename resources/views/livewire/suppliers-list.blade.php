@@ -3,9 +3,10 @@
 x-cloak 
 x-init="$watch('selectPage', value => selectPageUpdated(value))" 
 x-data="{
-    stockCurrent: @entangle('stockInPage'),
+    suppliersCurrent: @entangle('suppliersInPage'),
     sortField: @entangle('sortField'),
     sortDirection: @entangle('sortDirection'),
+    showAddSupplierModal: @entangle('showAddSupplierModal'),
     selectPage: false,
     checked: [],
     showActionDropDown: false,
@@ -31,7 +32,7 @@ x-data="{
     },
     selectPageUpdated(value) {
         if (value) {
-            this.checked = this.stockCurrent;
+            this.checked = this.suppliersCurrent;
         } else {
             this.checked = [];
         }
@@ -42,8 +43,10 @@ x-data="{
 }"
 class="tw-text-black"
 >
+<form wire:submit.prevent="submit">
     <div class="tw-flex tw-flex-row tw-justify-end tw-gap-3">
-        <div x-show="checked.length > 0" class="tw-relative tw-w-48 tw-mb-3" x-transition>
+
+        <div x-show="checked.length > 0" class="tw-relative tw-w-48" x-transition>
             <div class="tw-flex tw-flex-row tw-justify-end">
                 <div @click="showActionDropDown = ! showActionDropDown"  class=" tw-w-fit tw-flex tw-flex-row tw-items-center tw-gap-2 tw-bg-black tw-text-white tw-py-2 tw-px-4 tw-rounded-md tw-cursor-pointer hover:tw-shadow-md">
                     <div class=" tw-font-semibold">Actions</div>
@@ -65,15 +68,15 @@ class="tw-text-black"
              >
                 <div>
                     <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer"  @click="exportSelected">Export</div>
-                    <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer" @click="confirmDelete">Delete</div> 
+                    <div class="tw-pr-4 tw-pl-2 tw-py-2 hover:tw-bg-neutral-100 tw-rounded-md tw-cursor-pointer" @click="confirmDelete">Delete</div>
                 </div>
             </div>
         </div>
 
        
-        <a href="/add-stock-item-page" class=" hover:no-underline">
-            <x-custom-btn title="Add Item" icon="heroicon-o-plus-circle"/>
-        </a>
+        <div @click="showAddSupplierModal=true">
+            <x-custom-btn title="Add Supplier" icon="heroicon-o-plus-circle"/>
+        </div>
       
    </div>
 
@@ -82,11 +85,8 @@ class="tw-text-black"
         <div>
             <div class="tw-grid tw-grid-cols-6 tw-mt-2">
                 <div class=" tw-col-span-4 tw-flex tw-flex-row tw-flex-wrap tw-gap-3">  
-                    <x-filter-input filtername='code_filter' placeholder='Code' wireFilterName='codeFilter'></x-filter-input>
-                    <x-filter-input filtername='name_filter' placeholder='Name' wireFilterName='nameFilter'></x-filter-input>
-                    <x-filter-input filtername='brand_filter' placeholder='Type' wireFilterName='brandFilter'></x-filter-input>
-                    <x-filter-input filtername='category_filter' placeholder='Category' wireFilterName='categoryFilter'></x-filter-input>
-                       
+                    <x-filter-input filtername='first_name_filter' placeholder='First Name' wireFilterName='firstNameFilter'></x-filter-input>
+                    <x-filter-input filtername='last_name_filter' placeholder='Last Name' wireFilterName='lastNameFilter'></x-filter-input>
                 </div>
     
                 <div class=" tw-col-span-2 tw-flex tw-flex-row tw-flex-wrap tw-justify-end tw-gap-5">
@@ -103,15 +103,13 @@ class="tw-text-black"
 
                         <div>
                             <div @click="openSortFieldDropDown = ! openSortFieldDropDown" @click.outside="openSortFieldDropDown = false"  class=" tw-px-2">{{ $sortFieldName }}</div>
-                            <div x-transition  x-show="openSortFieldDropDown" class=" tw-absolute tw-bg-white tw-rounded-md tw-shadow-lg tw-w-48 tw-top-44 tw-right-9 tw-px-1 tw-py-3">
+                            <div x-transition  x-show="openSortFieldDropDown" class=" tw-absolute tw-bg-rose-400 tw-rounded-md tw-shadow-lg tw-w-48 tw-top-44 tw-right-9 tw-py-3">
                                 <ul class="tw-flex tw-flex-col tw-gap-1 ">
                                     {{-- <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('id')">ID</li> --}}
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('created_on','Created On')">Created On</li>
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('code','Code')">Code</li>
-                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('item','Name')">Name</li>
-                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('brand','Brand')">Brand</li>
-                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('category','Category')">Category</li>
-                                    
+                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('item','Name')">First Name</li>
+                                    <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('brand','Brand')">Last Name</li>
                                     <li class=" hover:tw-bg-neutral-200 tw-cursor-pointer tw-rounded-md tw-px-3 tw-py-1" wire:click="changeSortField('created_by','Created By')">Created By</li>
                                 </ul>
                             </div>
@@ -128,13 +126,11 @@ class="tw-text-black"
                     <thead>
                         <tr class=" tw-bg-neutral-200 tw-py-2 tw-rounded-full tw-text-black">
                             <th class="tw-p-3"><input type="checkbox" x-model="selectPage"></th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">ID</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Code</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Name</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Category</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Type</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Quantity Available</th>
-                            <th class="tw-text-center tw-p-2 tw-font-semibold">Price Per Unit</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Supplier Code</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">First Name</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Last Name</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Mobile Number</th>
+                            <th class="tw-text-center tw-p-2 tw-font-semibold">Status</th>
                             <th class="tw-text-center tw-p-2 tw-font-semibold">Created On</th>
                             <th class="tw-text-center tw-p-2 tw-font-semibold">Created By</th>
                             <th></th>
@@ -142,20 +138,18 @@ class="tw-text-black"
                     </thead>
 
                     <tbody style="font-size: 15px;">
-                        @foreach( $stock as $key => $item )
+                        @foreach( $suppliers as $key => $item )
                         <tr class="tw-text-black tw-border-b tw-border-b-neutral-200 tw-cursor-pointer hover:tw-bg-neutral-100">
                             <td class="tw-p-3"><input type="checkbox" value="{{ $item->id }}" x-model="checked"></td>
-                            <td class="tw-p-3 tw-text-center">{{ $key++ }}</td>
                             <td class="tw-text-center hover:tw-underline">
                                 <a class="tw-text-black hover:tw-text-black" href="/get-stock-item-detail/{{ Crypt::encrypt($item->code) }}">
                                     {{ $item->code }}
                                 </a>
                             </td>
-                            <td class="tw-text-center">{{ ucwords(strtolower(Str::limit($item->item,50))) }}</td> 
-                            <td class="tw-text-center">{{ $item->category }}</td>
-                            <td class="tw-text-center">{{ $item->brand }}</td>
-                            <td class="tw-text-center">{{ $item->quantity }}</td>
-                            <td class="tw-text-center">{{ $item->price_per_unit }}</td>
+                            <td class="tw-p-3 tw-text-center">{{ ucwords(strtolower(Str::limit($item->first_name,50))) }}</td>
+                            <td class="tw-text-center">{{ ucwords(strtolower(Str::limit($item->last_name,50))) }}</td>
+                            <td class="tw-text-center">{{ $item->mobile_number }}</td>
+                            <td class="tw-text-center">{{ $item->status }}</td>
                             <td class="tw-text-center">{{ $item->created_on }}</td>
                             <td class="tw-text-center">{{ $item->created_by }}</td>
                         </tr>
@@ -173,6 +167,53 @@ class="tw-text-black"
                 <div class="tw-px-4 tw-py-1 tw-cursor-pointer hover:tw-bg-neutral-300" wire:click="setPaginate(200)">200</div>
             </div>
         </div>
-       </div>
+    </div>
+
+
+    {{-- modaLs --}}
+    <x-custom-modal title="Add Supplier" showModal="showAddSupplierModal">
+        <div>
+            
+                <div class="tw-flex tw-flex-col md:tw-grid md:tw-grid-cols-3 tw-gap-6 tw-mb-10">
+                    <div>
+                    <x-text-input 
+                    label='First Name' 
+                    inputID='supplierFirstName' 
+                    model='supplierFirstName' 
+                    errorMessage={{ $message }} 
+                    :error="$errors->first('supplierFirstName')" 
+                    ></x-text-input>
+                    </div>
+    
+                    <div>
+                        <x-text-input 
+                        label='Last Name' 
+                        inputID='supplierLastName' 
+                        model='supplierLastName' 
+                        errorMessage={{ $message }} 
+                        :error="$errors->first('supplierLastName')" 
+                        ></x-text-input>
+                    </div>
+    
+                    <div>
+                        <x-text-input 
+                        label='Mobile Number' 
+                        inputID='supplierMobileNumber' 
+                        model='supplierMobileNumber' 
+                        errorMessage={{ $message }} 
+                        :error="$errors->first('supplierMobileNumber')" 
+                        ></x-text-input>
+                    </div>
+        
+                </div>
+
+                <div class="tw-flex tw-flex-row tw-justify-end tw-px-3">
+                    <x-custom-save-btn title="Save" type='submit'/>
+                </div>
+          
+        </div>
+        
+    </x-custom-modal>
+</form>
 </div>
 

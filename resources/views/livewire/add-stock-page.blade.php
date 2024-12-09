@@ -37,7 +37,7 @@ x-data="{
 }"
 style="font-family: 'Nunito'"
 >
-    <form wire:submit.prevent="submit" class="tw-w-full">
+    <form wire:submit.prevent="submit" class="tw-w-full tw-h-[calc(100vh-18rem)]">
 
         @if($status == 'edit') 
         <div class="tw-flex tw-flex-row tw-justify-end tw-gap-3 tw-mb-4">    
@@ -73,6 +73,40 @@ style="font-family: 'Nunito'"
                 <div class="card-content">
                     <div class="card-body">
 
+                        <div class="tw-px-3 tw-mb-10">
+                            <input type="file" wire:model="photo" accept="image/*" hidden id="fileInput">
+    
+                            <!-- Label styled as a button -->
+                            @if($status == 'new')
+                            <label for="fileInput" class="upload-btn  tw-px-8 tw-py-2 tw-cursor-pointer tw-rounded-md tw-font-semibold tw-bg-neutral-400 tw-text-white">Upload Image</label>
+                            @elseif($status == 'edit') 
+                            <label x-show='!showAmendButton' for="fileInput" class="upload-btn  tw-px-8 tw-py-2 tw-cursor-pointer tw-rounded-md tw-font-semibold tw-bg-neutral-400 tw-text-white">Change Image</label>
+                            @endif 
+
+                            <div class="tw-mt-4">
+                                @error('photo') <span class="error tw-text-red-500 tw-font-semibold">{{ $message }}</span> @enderror
+                            </div>
+
+                          
+                            @if($status != 'new' && is_string($photo))
+                                @if ($photo)
+                                    <div class="tw-h-44 tw-w-44">
+                                        <img src="{{ asset('storage/attachments/' . $photo) }}">
+                                    </div>
+                                @endif
+                            @elseif($photo)
+                            <div class="tw-flex tw-flex-col tw-gap-3">   
+                                <div class="tw-h-44 tw-w-44">
+                                    <img src="{{ $photo->temporaryUrl() }}">
+                                </div>
+                        
+                                <div class="">
+                                    <x-heroicon-o-trash wire:click="removePhoto()" class="tw-w-5 tw-h-5 tw-text-black tw-cursor-pointer"/>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
                         <div class="tw-flex tw-flex-col md:tw-grid md:tw-grid-cols-3 tw-gap-6 tw-mb-10">
                             <div class="tw-px-3">
                             <x-select-input 
@@ -88,7 +122,7 @@ style="font-family: 'Nunito'"
                             /> 
                             </div>
                     
-                            <div>
+                            <div class="tw-px-3">
                             <x-text-input 
                             label='Item Name' 
                             inputID='itemName' 
@@ -102,7 +136,7 @@ style="font-family: 'Nunito'"
 
                             <div class="tw-px-3">
                                 <x-select-input 
-                                label='Brand' 
+                                label='Type' 
                                 inputID='itemBrand' 
                                 :arr="$brands" 
                                 reference='type' 
@@ -132,7 +166,7 @@ style="font-family: 'Nunito'"
                             /> 
                             </div>
                     
-                            <div>
+                            <div class="tw-px-3">
                             <x-text-input 
                             label='Quantity' 
                             inputID='itemQuantity' 
@@ -143,7 +177,7 @@ style="font-family: 'Nunito'"
                             ></x-text-input>
                             </div>
 
-                            <div>
+                            <div class="tw-px-3">
                                 <x-text-input 
                                 label='Restock Limit' 
                                 inputID='itemRestockLimit' 
@@ -157,7 +191,7 @@ style="font-family: 'Nunito'"
                         </div>
 
                         <div class="tw-flex tw-flex-col md:tw-grid md:tw-grid-cols-3 tw-gap-6 tw-mb-10">
-                            <div>
+                        {{--     <div>
                             <x-text-input 
                             label='Cost Price' 
                             inputID='itemCostPrice' 
@@ -166,11 +200,11 @@ style="font-family: 'Nunito'"
                             :error="$errors->first('itemCostPrice')" 
                             :disabled="$editStatus == 'uneditable'"
                             ></x-text-input>
-                            </div>
+                            </div> --}}
 
-                            <div>
+                            <div class="tw-px-3">
                                 <x-text-input 
-                                label='Selling Price' 
+                                label='Price' 
                                 inputID='itemSellingPrice' 
                                 model='itemSellingPrice' 
                                 errorMessage={{ $message }} 
@@ -187,7 +221,7 @@ style="font-family: 'Nunito'"
 
         </div>
 
-        <div class="sizes-info">
+{{--         <div class="sizes-info">
             <div class="card tw-pt-3" style="height: auto;">
                 <div class="card-content">
                     <div class="card-body">
@@ -215,7 +249,6 @@ style="font-family: 'Nunito'"
                                     <th class="tw-border tw-uppercase tw-tracking-wide tw-text-sm tw-font-semibold tw-bg-neutral-100 tw-px-4 tw-text-left tw-py-1 tw-w-2/12">Conversion Factor</th>
                                     <th class="tw-border tw-uppercase tw-tracking-wide tw-text-sm tw-font-semibold tw-bg-neutral-100 tw-px-4 tw-py-1 tw-w-2/12">Selling Price</th>
                     
-                                    {{-- <th class="tw-border tw-uppercase tw-tracking-wide tw-text-sm tw-font-semibold tw-bg-neutral-100 tw-px-4 tw-py-1"></th> --}}
                                 </tr>
                                 </thead>
                         
@@ -286,12 +319,6 @@ style="font-family: 'Nunito'"
                                         >
                                     </td>
                                 
-                                    
-                                    {{--   <td class="tw-border tw-px-4 tw-py-4">
-                                        <x-heroicon-o-pencil class="tw-w-6 tw-h-4 tw-text-black tw-cursor-pointer"
-                                            x-on:click="editRow(row)"
-                                        />
-                                    </td> --}}
                                     </tr>
                                 </template>
                                 </tbody>
@@ -325,7 +352,9 @@ style="font-family: 'Nunito'"
                 </div>
             </div>
 
-        </div>
+        </div> --}}
+
+        
         
     </form>
 </div>

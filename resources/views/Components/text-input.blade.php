@@ -6,7 +6,7 @@
 'input_border_color'=>'tw-border-gray-200'
 ])
 
-<div class="tw-w-full tw-md:w-1/3 tw-px-3">
+<div class="tw-w-full tw-md:w-1/3">
     <div>
         <label class="tw-block tw-uppercase tw-tracking-wide tw-text-gray-700 tw-font-bold tw-mb-2" for="grid-last-name">
             {{ $label }}

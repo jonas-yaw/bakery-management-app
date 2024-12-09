@@ -374,3 +374,16 @@ Route::post('/edit-supplier',
 Route::get('/delete-supplier', 
 		['uses' => '\App\Http\Controllers\StockController@deleteSupplier',
 		'as' => 'delete-supplier',]);
+
+#-----------------QUOTATION 
+Route::get('/get-quotations', 
+['uses' => '\App\Http\Controllers\InvoiceController@getQuotation',
+		'as' => 'get-quotations',]);
+
+Route::get('/add-quotation-page', 
+['uses' => '\App\Http\Controllers\InvoiceController@getAddQuotationPage',
+		'as' => 'add-quotation-page',]);
+
+Route::get('/edit-quotation-page/{id}', 
+['uses' => '\App\Http\Controllers\InvoiceController@getEditQuotationPage',
+		'as' => 'edit-quotation-page',]);
